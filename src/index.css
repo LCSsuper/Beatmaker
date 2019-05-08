@@ -1,0 +1,271 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #777; 
+}
+
+#header {
+  height: 60px;
+  background-color: #333;
+  display: flex;
+  box-shadow: 0 1px 10px black;
+}
+
+#header > #playback {
+  flex: 0 0 auto;
+  padding: 5px;
+}
+
+#header > #playback > div {
+  float: left;
+  width: 50px;
+  height: 50px;
+  margin-right: 5px;
+  background-color: #777;
+  border-radius: 5px;
+  font-size: 1.5rem;
+  padding: 11px 0 0 14px;
+  color: #333;
+  transition: transform .2s;
+  cursor: pointer;
+  box-shadow: 0 0 2px black;
+}
+
+#header > #playback > div:hover {
+  transform: scale(1.1);
+  box-shadow: inset 0 0 25px rgb(245, 168, 24);
+}
+
+#header > #playback > #play-pause.playing {
+  box-shadow: inset 0 0 25px rgb(245, 168, 24);
+}
+
+#header > #settings {
+  padding: 5px;
+}
+
+#header > #settings > div {
+  font-size: 1.5rem;
+  color: #ddd;
+  float: left;
+  height: 50px;
+  width: 150px;
+  background-color: #555;
+  margin-right: 5px;
+  border-radius: 5px;
+  box-shadow: inset 0 0 5px #333;
+  display: flex;
+}
+
+#header > #settings > div > div {
+  flex: 0 0 auto;
+  padding: 3px 3px 0 0;
+}
+
+#header > #settings > div > .counter {
+  flex: 1 1 auto;
+  padding: 11px 0 0 14px;
+}
+
+#header > #settings > div > div > div {
+  background-color: #777;
+  border-radius: 5px;
+  width: 21px;
+  height: 21px;
+  margin-bottom: 2px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+#header > #settings > div > div > div:hover {
+  box-shadow: inset 0 0 10px rgb(245, 168, 24);
+}
+
+#header > #settings > div > div > div:first-child {
+  padding: 4px 0 0 5px;
+}
+
+#header > #settings > div > div > div:last-child {
+  padding: 0 0 0 5px;
+}
+
+#header > #download {
+  flex: 0 0 auto;
+  padding: 5px;
+}
+
+#header > #download > div {
+  float: left;
+  width: 50px;
+  height: 50px;
+  margin-right: 5px;
+  background-color: #777;
+  border-radius: 5px;
+  font-size: 1.5rem;
+  padding: 11px 0 0 14px;
+  color: #333;
+  transition: transform .2s;
+  cursor: pointer;
+  box-shadow: 0 0 2px black;
+  position: relative;
+}
+
+#header > #download > div:hover {
+  transform: scale(1.1);
+  box-shadow: inset 0 0 25px rgb(245, 168, 24);
+}
+
+input {
+  border: 1px solid red;
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+#header > div {
+  flex: 1 1 auto;
+}
+
+#tabs {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#ticks {
+  display: inline-block;
+}
+
+.tick {
+  float: left;
+  width: 30px;
+  margin: 2px;
+  border-radius: 5px;
+  background-color: #333;
+}
+
+.tick.active {
+  box-shadow: inset 0 0 25px rgb(106, 255, 151);
+}
+
+#pads {
+  background: lightblue;
+  width: 100%;
+  display: flex;
+  height: 100px;
+  transition: height .2s;
+}
+
+#pads > div {
+  height: 100%;
+  flex: 1;
+}
+
+.sound {
+  width: 25px;
+  height: 25px;
+  border: 1px solid #333;
+  border-radius: 5px;
+  cursor: move;
+}
+
+.drop-tick {
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+}
+
+.sound-in-tick {
+  width: 24px;
+  height: 24px;
+  margin: 3px 0 0 3px;
+  border-radius: 5px;
+  padding: 3px 0 0 6px;
+  cursor: pointer;
+}
+
+.sound-in-tick:last-child {
+  margin: 3px 0 3px 3px;
+}
+
+.button {
+  background-color: #777;
+  border-radius: 5px;
+  width: 30px;
+  height: 30px;
+  margin-bottom: 2px;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 6px 0 0 8px;
+}
+
+.button:hover {
+  box-shadow: inset 0 0 10px rgb(245, 168, 24);
+}
+
+.sound-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sound-container > div {
+  box-sizing: border-box;
+  padding: 5px;
+}
+
+.sound-container > div {
+  flex: 0 0 auto;
+  height: 100%;
+}
+
+.sound-container > div.wave {
+  flex: 1 1 auto;
+}
+
+.sound-container > div.volume {
+  padding: 15px 5px 15px 0;
+}
+
+.rc-slider-track {
+  background-color: #555 !important;
+}
+
+.rc-slider-rail {
+  background-color: #aaa !important;
+}
+
+.rc-slider-handle {
+  border-color: #555 !important;
+  background-color: #555 !important;
+}
+
+.waveform {
+  background: #555;
+  border: 2px solid #333;
+  border-radius: 5px;
+  padding: 5px;
+}
