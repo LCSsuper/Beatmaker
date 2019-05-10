@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Fragment } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faPause, faStop, faSortUp, faSortDown, faDownload, faUpload } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faPause, faStop, faSortUp, faSortDown, faDownload, faUpload, faBan } from '@fortawesome/free-solid-svg-icons';
+import { isMobile } from 'react-device-detect';
 
 import Tick from './Tick.js';
 import Sound from './Sound.js';
@@ -159,80 +160,89 @@ const App = () => {
 
     return (
         <div id='app' onKeyDown={onKeyDown} tabIndex='0'>
-            <div id='header'>
-                <div id='playback'>
-                    <div id='play-pause' className={playing ? 'playing' : ''} onClick={() => setPlaying(!playing)}>
-                        {playing ? <FontAwesomeIcon icon={faPause} /> : <FontAwesomeIcon icon={faPlay} />}
-                    </div>
-                    <div onClick={() => { setPlaying(false); setCurrentTick(0); }}>
-                        <FontAwesomeIcon icon={faStop} />
-                    </div>
-                </div>
-                <div id='settings'>
-                    <div>
-                        <div className='counter'>{bpm} BPM</div>
-                        {!playing && (
-                            <div>
-                                <div onClick={() => addBpm(1)}><FontAwesomeIcon icon={faSortUp} /></div>
-                                <div onClick={() => addBpm(-1)}><FontAwesomeIcon icon={faSortDown} /></div>
+            {!isMobile ? (
+                <Fragment>
+                    <div id='header'>
+                        <div id='playback'>
+                            <div id='play-pause' className={playing ? 'playing' : ''} onClick={() => setPlaying(!playing)}>
+                                {playing ? <FontAwesomeIcon icon={faPause} /> : <FontAwesomeIcon icon={faPlay} />}
                             </div>
-                        )}
-                    </div>
-                    <div>
-                        <div className='counter'>{tickCount} TICKS</div>
-                        {!playing && (
-                            <div>
-                                <div onClick={() => addTickCount(1)}><FontAwesomeIcon icon={faSortUp} /></div>
-                                <div onClick={() => addTickCount(-1)}><FontAwesomeIcon icon={faSortDown} /></div>
+                            <div onClick={() => { setPlaying(false); setCurrentTick(0); }}>
+                                <FontAwesomeIcon icon={faStop} />
                             </div>
-                        )}
+                        </div>
+                        <div id='settings'>
+                            <div>
+                                <div className='counter'>{bpm} BPM</div>
+                                {!playing && (
+                                    <div>
+                                        <div onClick={() => addBpm(1)}><FontAwesomeIcon icon={faSortUp} /></div>
+                                        <div onClick={() => addBpm(-1)}><FontAwesomeIcon icon={faSortDown} /></div>
+                                    </div>
+                                )}
+                            </div>
+                            <div>
+                                <div className='counter'>{tickCount} TICKS</div>
+                                {!playing && (
+                                    <div>
+                                        <div onClick={() => addTickCount(1)}><FontAwesomeIcon icon={faSortUp} /></div>
+                                        <div onClick={() => addTickCount(-1)}><FontAwesomeIcon icon={faSortDown} /></div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        <div id='download'>
+                            <div>
+                                <input type="file" name="file" onChange={uploadConfig} />
+                                <FontAwesomeIcon icon={faUpload} />
+                            </div>
+                            <div onClick={downloadConfig}>
+                                <FontAwesomeIcon icon={faDownload} />
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div id='download'>
-                    <div>
-                        <input type="file" name="file" onChange={uploadConfig} />
-                        <FontAwesomeIcon icon={faUpload} />
+                    <div id='tabs'>
+                        <div id='ticks'>
+                            {ticks.map(tick => {
+                                const length = ticks.length * 34 + tickCount * 15;
+                                const shouldWrap = ticks.length / 2 === tick.id && length > window.innerWidth;
+                                return (
+                                    <React.Fragment>
+                                        {shouldWrap && <br />}
+                                        <Tick
+                                            key={tick.id}
+                                            id={tick.id}
+                                            sounds={tick.sounds}
+                                            active={currentTick === tick.id}
+                                            toggleSound={toggleSound}
+                                            style={{ marginRight: tick.id % 4 === 3 ? '15px' : '2px' }}
+                                        />
+                                    </React.Fragment>
+                                )
+                            })}
+                        </div>
                     </div>
-                    <div onClick={downloadConfig}>
-                        <FontAwesomeIcon icon={faDownload} />
+                    <div id='pads'>
+                        {sounds.map(sound => (
+                            <Sound
+                                key={sound.id}
+                                id={sound.id}
+                                volume={sound.volume}
+                                onPlay={() => playSound(sound)}
+                                file={sound.file}
+                                time={[sound.start, sound.end]}
+                                setTime={setTime}
+                                setVolume={setVolume}
+                            />
+                        ))}
                     </div>
+                </Fragment>
+            ) : (
+                <div className='mobile'>
+                    <FontAwesomeIcon icon={faBan} />
+                    <p>Deze app wordt niet ondersteund op dit apparaat. Gebruik een laptop of PC om de app te gebruiken.</p>
                 </div>
-            </div>
-            <div id='tabs'>
-                <div id='ticks'>
-                    {ticks.map(tick => {
-                        const length = ticks.length * 34 + tickCount * 15;
-                        const shouldWrap = ticks.length / 2 === tick.id && length > window.innerWidth;
-                        return (
-                            <React.Fragment>
-                                {shouldWrap && <br />}
-                                <Tick
-                                    key={tick.id}
-                                    id={tick.id}
-                                    sounds={tick.sounds}
-                                    active={currentTick === tick.id}
-                                    toggleSound={toggleSound}
-                                    style={{ marginRight: tick.id % 4 === 3 ? '15px' : '2px' }}
-                                />
-                            </React.Fragment>
-                        )
-                    })}
-                </div>
-            </div>
-            <div id='pads'>
-                {sounds.map(sound => (
-                    <Sound
-                        key={sound.id}
-                        id={sound.id}
-                        volume={sound.volume}
-                        onPlay={() => playSound(sound)}
-                        file={sound.file}
-                        time={[sound.start, sound.end]}
-                        setTime={setTime}
-                        setVolume={setVolume}
-                    />
-                ))}
-            </div>
+            )}
         </div>
     );
 }

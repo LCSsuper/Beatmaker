@@ -10,6 +10,7 @@
     "rc-slider": "^8.6.9",
     "react": "^16.8.6",
     "react-audio-waveform": "0.0.5",
+    "react-device-detect": "^1.6.2",
     "react-dnd": "^7.4.5",
     "react-dnd-html5-backend": "^7.4.4",
     "react-dom": "^16.8.6",
