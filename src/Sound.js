@@ -1,7 +1,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay } from '@fortawesome/free-solid-svg-icons';
-import Slider from 'rc-slider';
+import Slider, { Range } from 'rc-slider';
 import 'rc-slider/assets/index.css';
 
 import Wave from './Wave.js';
@@ -15,7 +15,15 @@ const colors = [
     { id: 6, color: '#60b2d3' },
 ];
 
-const Sound = ({ id, file, startAt, volume, onPlay, setTime, setVolume }) => {
+const Sound = ({
+    id,
+    file,
+    onPlay,
+    time,
+    setTime,
+    volume,
+    setVolume,
+}) => {
 
     return (
         <div
@@ -28,10 +36,13 @@ const Sound = ({ id, file, startAt, volume, onPlay, setTime, setVolume }) => {
                 </div>
             </div>
             <div className='wave'>
-                <Wave src={file} onSeek={data => setTime(id, data)} startAt={startAt} />
+                <Wave src={file} onSeek={data => setTime(id, data)} time={time} />
+                <div className='range-container'>
+                    <Range min={0} max={100} value={time} pushable={5} onChange={value => setTime(id, value)} />
+                </div>
             </div>
             <div className='volume'>
-                <Slider vertical min={0} value={volume * 100} max={100} onChange={value => setVolume(id, value / 100)} />
+                <Slider vertical min={0} max={100} value={volume * 100} onChange={value => setVolume(id, value / 100)} />
             </div>
         </div>
     );

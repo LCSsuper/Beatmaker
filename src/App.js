@@ -58,9 +58,11 @@ const App = () => {
         }
     };
 
-    const setTime = (soundId, percentage) => {
+    const setTime = (soundId, value) => {
+        const [start, end] = value;
         const index = sounds.findIndex(s => s.id === soundId);
-        sounds[index].startAt = percentage;
+        sounds[index].start = start;
+        sounds[index].end = end;
         setSounds([...sounds]);
     };
 
@@ -81,7 +83,12 @@ const App = () => {
         const reader = new FileReader();
         reader.onload = (e) => {
             const config = JSON.parse(e.target.result);
-            if ('bpm' in config && 'sounds' in config && 'tickCount' in config && 'ticks' in config) {
+            if (
+                'bpm' in config 
+                && 'sounds' in config 
+                && 'tickCount' in config 
+                && 'ticks' in config
+            ) {
                 setBpm(config.bpm);
                 setTicks(config.ticks);
                 setSounds(config.sounds);
@@ -107,14 +114,20 @@ const App = () => {
 
         setTicks(ticks);
 
-        setSounds([
-            { id: 1, file: 'sounds/kick.wav', startAt: 0, volume: 1 },
-            { id: 2, file: 'sounds/hihat.wav', startAt: 0, volume: 1 },
-            { id: 3, file: 'sounds/snare.wav', startAt: 0, volume: 1 },
-            { id: 4, file: 'sounds/clap.wav', startAt: 0, volume: 1 },
-            { id: 5, file: 'sounds/perc.wav', startAt: 0, volume: 1 },
-            { id: 6, file: 'sounds/808.wav', startAt: 0, volume: 1 },
-        ]);
+        const _sounds = [
+            { id: 1, file: 'sounds/kick.wav', start: 0, end: 100, volume: 1 },
+            { id: 2, file: 'sounds/hihat.wav', start: 0, end: 100, volume: 1 },
+            { id: 3, file: 'sounds/snare.wav', start: 0, end: 100, volume: 1 },
+            { id: 4, file: 'sounds/clap.wav', start: 0, end: 100, volume: 1 },
+            { id: 5, file: 'sounds/perc.wav', start: 0, end: 100, volume: 1 },
+            { id: 6, file: 'sounds/808.wav', start: 0, end: 100, volume: 1 },
+        ];
+
+        _sounds.forEach(sound => {
+            playSound(sound, true);
+        });
+
+        setSounds(_sounds);
     }, []);
 
     useEffect(() => {
@@ -214,9 +227,9 @@ const App = () => {
                         volume={sound.volume}
                         onPlay={() => playSound(sound)}
                         file={sound.file}
+                        time={[sound.start, sound.end]}
                         setTime={setTime}
                         setVolume={setVolume}
-                        startAt={sound.startAt}
                     />
                 ))}
             </div>

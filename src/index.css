@@ -172,16 +172,20 @@ input {
 }
 
 #pads {
-  background: lightblue;
+  background: #333;
+  box-shadow: 0 1px 10px black;
   width: 100%;
   display: flex;
-  height: 100px;
+  height: 150px;
   transition: height .2s;
+  padding: 5px;
 }
 
 #pads > div {
-  height: 100%;
+  height: calc(100% - 10px);
   flex: 1;
+  margin: 5px;
+  border-radius: 5px;
 }
 
 .sound {
@@ -213,6 +217,7 @@ input {
 
 .button {
   background-color: #777;
+  color: #333;
   border-radius: 5px;
   width: 30px;
   height: 30px;
@@ -247,7 +252,7 @@ input {
 }
 
 .sound-container > div.volume {
-  padding: 15px 5px 15px 0;
+  padding: 13px 5px 35px 0;
 }
 
 .rc-slider-track {
@@ -263,9 +268,35 @@ input {
   background-color: #555 !important;
 }
 
+.rc-slider-handle:active {
+  box-shadow: unset !important;
+}
+
 .waveform {
   background: #555;
   border: 2px solid #333;
   border-radius: 5px;
+  padding: 5px;
+  position: relative;
+}
+
+.waveform > div.start, .waveform > div.end {
+  position: absolute;
+  height: 100%;
+  background-color: black;
+  opacity: .5;
+  top: 0;
+  z-index: 5; 
+}
+
+.waveform > div.start {
+  left: 0;
+}
+
+.waveform > div.end {
+  right: 0;
+}
+
+.range-container {
   padding: 5px;
 }

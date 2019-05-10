@@ -1,11 +1,13 @@
 import { Howl } from 'howler';
 
-export const playSound = ({ file, startAt, volume }) => {
+export const playSound = ({ file, start, end, volume }, init) => {
     const sound = new Howl({ src: [file] });
-    const seek = sound.duration() * startAt
-    sound.seek(seek);
-    sound.volume(volume);
+    const startAt = sound.duration() * (start / 100);
+    const stopAt = sound.duration() * (end / 100) - startAt;
+    sound.seek(startAt);
+    sound.volume(init ? 0 : volume);
     sound.play();
+    setTimeout(() => sound.stop(), stopAt * 1000);
 };
 
 export const exportToJson = (objectData) => {
