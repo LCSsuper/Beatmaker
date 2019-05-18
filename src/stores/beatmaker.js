@@ -1,34 +1,77 @@
 import { observable, action, decorate } from 'mobx';
 
-import { playSound, exportToJson } from '../utils/utils';
+import { playSound } from '../utils/utils';
+
+const storage = window.localStorage;
 
 class BeatmakerStore {
     constructor() {
-        this.bpm = 144;
-        this.tickCount = 8;
+        this.beat = {};
+        // this.bpm = 144;
+        // this.tickCount = 0;
         this.stepsPerTick = 4;
         this.currentTick = 0;
-        this.ticks = [];
+        // this.ticks = [];
         this.tid = 0;
-        this.sounds = [
-            { id: 1, file: 'sounds/kick.wav', start: 0, end: 100, volume: 1 },
-            { id: 2, file: 'sounds/hihat.wav', start: 0, end: 100, volume: 1 },
-            { id: 3, file: 'sounds/snare.wav', start: 0, end: 100, volume: 1 },
-            { id: 4, file: 'sounds/clap.wav', start: 0, end: 100, volume: 1 },
-            { id: 5, file: 'sounds/perc.wav', start: 0, end: 100, volume: 1 },
-            { id: 6, file: 'sounds/808.wav', start: 0, end: 100, volume: 1 },
-        ];
+        // this.sounds = [];
         this.playing = false;
         this.playSound = playSound;
+    };
 
-        for (let i = 0; i < this.tickCount * 4; i++) {
-            this.ticks.push({ id: i, sounds: [] });
-            this.ticks = [...this.ticks];
+    initialize = () => {
+        let beats = this.get('beats');
+        if (!beats) {
+            beats = [
+                { id: 'beat-1', name: 'New beat' },
+            ];
+            this.set('beats', beats);
+
+            const beat = {
+                id: 'beat-1',
+                name: 'New beat',
+                bpm: 144,
+                tickCount: 4,
+                ticks: [
+                    { id: 0, sounds: [] },
+                    { id: 1, sounds: [] },
+                    { id: 2, sounds: [] },
+                    { id: 3, sounds: [] },
+                    { id: 4, sounds: [] },
+                    { id: 5, sounds: [] },
+                    { id: 6, sounds: [] },
+                    { id: 7, sounds: [] },
+                    { id: 8, sounds: [] },
+                    { id: 9, sounds: [] },
+                    { id: 10, sounds: [] },
+                    { id: 11, sounds: [] },
+                    { id: 12, sounds: [] },
+                    { id: 13, sounds: [] },
+                    { id: 14, sounds: [] },
+                    { id: 15, sounds: [] },
+                ],
+                sounds: [
+                    { id: 1, file: 'sounds/kick.wav', start: 0, end: 100, volume: 1 },
+                    { id: 2, file: 'sounds/hihat.wav', start: 0, end: 100, volume: 1 },
+                    { id: 3, file: 'sounds/snare.wav', start: 0, end: 100, volume: 1 },
+                    { id: 4, file: 'sounds/clap.wav', start: 0, end: 100, volume: 1 },
+                    { id: 5, file: 'sounds/perc.wav', start: 0, end: 100, volume: 1 },
+                    { id: 6, file: 'sounds/808.wav', start: 0, end: 100, volume: 1 },
+                ],
+            };
+
+            this.set('beat-1', beat);
         }
 
-        this.sounds.forEach(sound => {
-            playSound(sound, true);
-        });
+        const beat1 = this.get('beat-1');
+
+        // storage.removeItem('beat-1');
+        // storage.removeItem('beats');
+
+        this.beat = beat1;
+        this.bpm = beat1.bpm;
+        this.sounds = beat1.sounds;
+        this.tickCount = beat1.tickCount;
+        this.ticks = beat1.ticks;
     };
 
     nextTick = () => {
@@ -43,31 +86,33 @@ class BeatmakerStore {
     };
 
     addBpm = (amount) => {
-        if (this.bpm + amount === 181 || this.bpm + amount === 59) return;
-        this.bpm = this.bpm + amount;
+        if (this.beat.bpm + amount === 181 || this.beat.bpm + amount === 59) return;
+        this.beat.bpm = this.beat.bpm + amount;
+        this.set(this.beat.id, this.beat);
     };
 
     addTickCount = (amount) => {
-        if (this.tickCount + amount === 17 || this.tickCount + amount === 3) return;
-        this.tickCount = this.tickCount + amount;
+        if (this.beat.tickCount + amount === 17 || this.beat.tickCount + amount === 3) return;
+        this.beat.tickCount = this.beat.tickCount + amount;
+        this.set(this.beat.id, this.beat);
     };
 
     playSounds = () => {
-        if (!this.ticks.length) return;
-        this.ticks[this.currentTick].sounds.forEach(soundId => {
-            const sound = this.sounds.find(s => s.id === soundId);
+        if (!this.beat.ticks.length) return;
+        this.beat.ticks[this.currentTick].sounds.forEach(soundId => {
+            const sound = this.beat.sounds.find(s => s.id === soundId);
             playSound(sound);
         });
     };
 
     toggleSound = (soundId, tickId) => {
-        if (this.ticks[tickId].sounds.includes(soundId)) {
-            const index = this.ticks[tickId].sounds.indexOf(soundId);
-            this.ticks[tickId].sounds.splice(index, 1);
-            this.ticks = [...this.ticks];
+        if (this.beat.ticks[tickId].sounds.includes(soundId)) {
+            const index = this.beat.ticks[tickId].sounds.indexOf(soundId);
+            this.beat.ticks[tickId].sounds.splice(index, 1);
+            this.setTicks([...this.ticks]);
         } else {
-            this.ticks[tickId].sounds.push(soundId);
-            this.ticks = [...this.ticks];
+            this.beat.ticks[tickId].sounds.push(soundId);
+            this.setTicks([...this.ticks]);
         }
     };
 
@@ -77,14 +122,18 @@ class BeatmakerStore {
 
     setTime = (soundId, value) => {
         const [start, end] = value;
-        const index = this.sounds.findIndex(s => s.id === soundId);
-        this.sounds[index].start = start;
-        this.sounds[index].end = end;
-        this.sounds = [...this.sounds];
+        const index = this.beat.sounds.findIndex(s => s.id === soundId);
+        this.beat.sounds[index].start = start;
+        this.beat.sounds[index].end = end;
+        this.beat.sounds = [...this.sounds];
+        this.set(this.beat.id, this.beat);
     };
 
     setTicks = (ticks) => {
-        this.ticks = ticks;
+        if (ticks.length) {
+            this.beat.ticks = ticks;
+            this.set(this.beat.id, this.beat);
+        }
     };
 
     setTid = (tid) => {
@@ -92,60 +141,44 @@ class BeatmakerStore {
     };
 
     setVolume = (soundId, percentage) => {
-        const index = this.sounds.findIndex(s => s.id === soundId);
-        this.sounds[index].volume = percentage;
-        this.sounds = [...this.sounds];
+        const index = this.beat.sounds.findIndex(s => s.id === soundId);
+        this.beat.sounds[index].volume = percentage;
+        this.beat.sounds = [...this.beat.sounds];
+        this.set(this.beat.id, this.beat);
     };
 
     setFile = (soundId, src) => {
-        const index = this.sounds.findIndex(s => s.id === soundId);
-        this.sounds[index].file = src;
-        this.sounds = [...this.sounds];
-        playSound(this.sounds[index], true);
+        const index = this.beat.sounds.findIndex(s => s.id === soundId);
+        this.beat.sounds[index].file = src;
+        this.beat.sounds = [...this.beat.sounds];
+        this.set(this.beat.id, this.beat);
+        playSound(this.beat.sounds[index], true);
+    };
+
+    setName = (e) => {
+        this.beat.name = e.target.value;
+        this.set(this.beat.id, this.beat);
     };
 
     setPlaying = (playing = !this.playing) => {
         this.playing = playing;
     };
 
-    uploadConfig = (e) => {
-        if (!e.target.files[0]) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const config = JSON.parse(e.target.result);
-            if (
-                'bpm' in config 
-                && 'sounds' in config 
-                && 'tickCount' in config 
-                && 'ticks' in config
-            ) {
-                this.bpm = config.bpm;
-                this.ticks = config.ticks;
-                this.sounds = config.sounds;
-                this.tickCount = config.tickCount;
-            }
-        };
-        reader.readAsText(e.target.files[0]);
+    get(id) {
+        return JSON.parse(storage.getItem(id));
     };
 
-    downloadConfig = () => {
-        exportToJson({
-            bpm: this.bpm,
-            ticks: this.ticks,
-            sounds: this.sounds,
-            tickCound: this.tickCount,
-        });
+    set(id, value) {
+        storage.setItem(id, JSON.stringify(value));
     };
 };
 
 decorate(BeatmakerStore, {
-    bpm: observable,
-    tickCount: observable,
+    initialize: action,
     stepsPerTick: observable,
     currentTick: observable,
-    ticks: observable,
     tid: observable,
-    sounds: observable,
+    beat: observable,
     playing: observable,
     nextTick: action,
     addBpm: action,

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faUpload } from '@fortawesome/free-solid-svg-icons';
+import { faPlay } from '@fortawesome/free-solid-svg-icons';
 import Slider, { Range } from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import { observer } from 'mobx-react-lite';

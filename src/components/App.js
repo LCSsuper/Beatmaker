@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, Fragment } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faPause, faStop, faSortUp, faSortDown, faDownload, faUpload, faBan } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faPause, faStop, faSortUp, faSortDown, faBan } from '@fortawesome/free-solid-svg-icons';
 import { isMobile } from 'react-device-detect';
 import { observer } from 'mobx-react-lite';
 
@@ -11,13 +11,17 @@ import StoreContext from '../utils/context';
 const App = observer(() => {
 
     const { beatmakerStore: {
-        bpm,
-        tickCount,
+        initialize,
+        beat: {
+            bpm,
+            tickCount,
+            ticks,
+            sounds,
+            name,
+        },
         stepsPerTick,
         currentTick,
-        ticks,
         tid,
-        sounds,
         playing,
         nextTick,
         addBpm,
@@ -28,12 +32,11 @@ const App = observer(() => {
         setTicks,
         setTid,
         setPlaying,
-        uploadConfig,
-        downloadConfig,
+        setName,
     } } = useContext(StoreContext);
 
     const onKeyDown = (e) => {
-        if (e.keyCode === 32) {
+        if (e.keyCode === 32 && e.target.type !== 'text') {
             setPlaying();
         }
     };
@@ -44,6 +47,7 @@ const App = observer(() => {
     }, [currentTick]);
 
     useEffect(() => {
+        if (!ticks) return;
         const length = ticks.length;
         if (length < tickCount * stepsPerTick) {
             for (let i = 0; i < stepsPerTick; i++) {
@@ -53,7 +57,6 @@ const App = observer(() => {
             ticks.splice(-stepsPerTick, stepsPerTick);
         }
         setTicks([...ticks]);
-        
     }, [tickCount]);
 
     useEffect(() => {
@@ -64,6 +67,10 @@ const App = observer(() => {
             clearTimeout(tid);
         }
     }, [playing]);
+
+    useEffect(() => {
+        initialize();
+    }, []);
 
     return (
         <div id='app' onKeyDown={onKeyDown} tabIndex='0'>
@@ -97,24 +104,18 @@ const App = observer(() => {
                                     </div>
                                 )}
                             </div>
-                        </div>
-                        <div id='download'>
-                            <div>
-                                <input type="file" name="file" onChange={uploadConfig} />
-                                <FontAwesomeIcon icon={faUpload} />
-                            </div>
-                            <div onClick={downloadConfig}>
-                                <FontAwesomeIcon icon={faDownload} />
+                            <div className='name'>
+                                <input value={name || ''} onChange={setName} />
                             </div>
                         </div>
                     </div>
                     <div id='tabs'>
                         <div id='ticks'>
-                            {ticks.map(tick => {
+                            {ticks && ticks.map(tick => {
                                 const length = ticks.length * 34 + tickCount * 15;
                                 const shouldWrap = ticks.length / 2 === tick.id && length > window.innerWidth;
                                 return (
-                                    <React.Fragment>
+                                    <React.Fragment key={tick.id}>
                                         {shouldWrap && <br />}
                                         <Tick
                                             key={tick.id}
@@ -130,7 +131,7 @@ const App = observer(() => {
                         </div>
                     </div>
                     <div id='pads'>
-                        {sounds.map(sound => (
+                        {sounds && sounds.map(sound => (
                             <Sound key={sound.id} sound={sound} />
                         ))}
                     </div>
