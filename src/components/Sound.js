@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faUpload } from '@fortawesome/free-solid-svg-icons';
 import Slider, { Range } from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import { observer } from 'mobx-react-lite';
@@ -23,15 +23,12 @@ const Sound = observer(({ sound, sound: { id, file, start, end, volume }}) => {
         playSound,
         setTime,
         setVolume,
-        // setFile,
+        setFile,
     } } = useContext(StoreContext);
 
-    // const uploadAudio = (e) => {
-    //     const file = e.target.files[0];
-    //     if (!file || !file.type.startsWith('audio')) return;
-    //     const src = URL.createObjectURL(file);
-    //     setFile(id, `${src}|||${file.type.split('/')[1]}`);
-    // };
+    const uploadAudio = (e) => {
+        setFile(id, e.target.files[0]);
+    };
 
     return (
         <div
@@ -42,10 +39,10 @@ const Sound = observer(({ sound, sound: { id, file, start, end, volume }}) => {
                 <div onClick={() => playSound(sound)} className='button'>
                     <FontAwesomeIcon icon={faPlay} />
                 </div>
-                {/* <div className='button'>
-                    <input type="file" name="file" onChange={uploadAudio} />
+                <div className='button'>
+                    <input type='file' name='file' onChange={uploadAudio} />
                     <FontAwesomeIcon icon={faUpload} />
-                </div> */}
+                </div>
             </div>
             <div className='wave'>
                 <Wave src={file} time={[start, end]} />

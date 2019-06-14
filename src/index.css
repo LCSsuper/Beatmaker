@@ -118,14 +118,16 @@ input {
   cursor: pointer;
 }
 
+input[type='file'] {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+
 .name {
   float: right !important;
   width: 250px !important;
-}
-
-.button > input {
-  width: 100%;
-  height: 100%;
 }
 
 #header > div {
@@ -208,12 +210,15 @@ input {
   margin-bottom: 2px;
   font-size: 1rem;
   cursor: pointer;
-  padding: 6px 0 0 8px;
   position: relative;
 }
 
 .button:hover {
   box-shadow: inset 0 0 10px rgb(245, 168, 24);
+}
+
+.button > svg {
+  margin: 6px 0 0 8px;
 }
 
 .sound-container {
@@ -311,4 +316,35 @@ input {
 .mobile p {
   font-size: 30px;
   max-width: 80%
+}
+
+.error {
+  background: #444;
+  padding-left: 1rem;
+  border-radius: 5px;
+  color: white;
+  position: absolute;
+  bottom: -4rem;
+  left: 2rem;
+  width: 30rem;
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  z-index: 10;
+  box-shadow: 0 0 15px black;
+  opacity: 0;
+  transition: opacity .5s, bottom .5s;
+}
+
+.error-active {
+  opacity: 1;
+  bottom: 2rem;
+}
+
+.error > svg {
+  position: absolute;
+  right: 1.5rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #222;
 }

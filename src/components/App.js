@@ -4,6 +4,7 @@ import { faPlay, faPause, faStop, faSortUp, faSortDown, faBan } from '@fortaweso
 import { isMobile } from 'react-device-detect';
 import { observer } from 'mobx-react-lite';
 
+import Error from './Error.js';
 import Tick from './Tick.js';
 import Sound from './Sound.js';
 import StoreContext from '../utils/context';
@@ -74,6 +75,7 @@ const App = observer(() => {
 
     return (
         <div id='app' onKeyDown={onKeyDown} tabIndex='0'>
+            <Error />
             {!isMobile ? (
                 <Fragment>
                     <div id='header'>

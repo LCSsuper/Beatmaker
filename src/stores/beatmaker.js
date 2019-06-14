@@ -1,4 +1,5 @@
 import { observable, action, decorate } from 'mobx';
+import { blobToBase64String, base64StringToBlob } from 'blob-util';
 
 import { playSound } from '../utils/utils';
 
@@ -7,15 +8,12 @@ const storage = window.localStorage;
 class BeatmakerStore {
     constructor() {
         this.beat = {};
-        // this.bpm = 144;
-        // this.tickCount = 0;
         this.stepsPerTick = 4;
         this.currentTick = 0;
-        // this.ticks = [];
         this.tid = 0;
-        // this.sounds = [];
         this.playing = false;
         this.playSound = playSound;
+        this.error = '';
     };
 
     initialize = () => {
@@ -72,6 +70,16 @@ class BeatmakerStore {
         this.sounds = beat1.sounds;
         this.tickCount = beat1.tickCount;
         this.ticks = beat1.ticks;
+
+        this.sounds.forEach(sound => {
+            if (sound.base64) {
+                const blob = base64StringToBlob(sound.base64);
+                sound.file = URL.createObjectURL(blob);
+            }
+        });
+
+        this.beat.sounds = [...this.sounds];
+        this.set(this.beat.id, this.beat);
     };
 
     nextTick = () => {
@@ -109,10 +117,10 @@ class BeatmakerStore {
         if (this.beat.ticks[tickId].sounds.includes(soundId)) {
             const index = this.beat.ticks[tickId].sounds.indexOf(soundId);
             this.beat.ticks[tickId].sounds.splice(index, 1);
-            this.setTicks([...this.ticks]);
+            this.setTicks([...this.beat.ticks]);
         } else {
             this.beat.ticks[tickId].sounds.push(soundId);
-            this.setTicks([...this.ticks]);
+            this.setTicks([...this.beat.ticks]);
         }
     };
 
@@ -125,7 +133,7 @@ class BeatmakerStore {
         const index = this.beat.sounds.findIndex(s => s.id === soundId);
         this.beat.sounds[index].start = start;
         this.beat.sounds[index].end = end;
-        this.beat.sounds = [...this.sounds];
+        this.beat.sounds = [...this.beat.sounds];
         this.set(this.beat.id, this.beat);
     };
 
@@ -147,9 +155,28 @@ class BeatmakerStore {
         this.set(this.beat.id, this.beat);
     };
 
-    setFile = (soundId, src) => {
+    setFile = async (soundId, file) => {
+        if (!file) {
+            this.setError('No file found');
+            return;
+        } else if (!file.type.startsWith('audio')) {
+            this.setError(`No audiofile. Found type: ${file.type}`);
+            return;
+        } else if (file.size > 1000000) {
+            this.setError(`File too large, max 1MB. Found size: ${(file.size / 1000000).toFixed(2)}MB`);
+            return;
+        }
+
+        const base64 = await blobToBase64String(file);
+        
+        const blob = await base64StringToBlob(base64);
+        const src = URL.createObjectURL(blob);
+
         const index = this.beat.sounds.findIndex(s => s.id === soundId);
+
         this.beat.sounds[index].file = src;
+        this.beat.sounds[index].base64 = base64;
+        this.beat.sounds[index].type = file.type;
         this.beat.sounds = [...this.beat.sounds];
         this.set(this.beat.id, this.beat);
         playSound(this.beat.sounds[index], true);
@@ -171,6 +198,11 @@ class BeatmakerStore {
     set(id, value) {
         storage.setItem(id, JSON.stringify(value));
     };
+
+    setError = (error) => {
+        this.error = error;
+        setTimeout(() => this.error = '', 4000);
+    };
 };
 
 decorate(BeatmakerStore, {
@@ -180,6 +212,7 @@ decorate(BeatmakerStore, {
     tid: observable,
     beat: observable,
     playing: observable,
+    error: observable,
     nextTick: action,
     addBpm: action,
     addTickCount: action,
@@ -191,6 +224,7 @@ decorate(BeatmakerStore, {
     setFile: action,
     setPlaying: action,
     uploadConfig: action,
+    setError: action,
 });
 
 export default new BeatmakerStore();
